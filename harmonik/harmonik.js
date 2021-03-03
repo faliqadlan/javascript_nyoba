@@ -45,6 +45,7 @@ function harmonicPotential(xmin,leb,om,x,v0 = 0)
 {
     //$xp = [];
     xp = x - xmin - leb / 2;
+    console.log(xp, x, xmin, leb)
     pot = (0.5 * om * xp * xp) + v0;
     return pot;
 }
