@@ -5,9 +5,7 @@ function submit() {
         initE   = parseFloat(document.getElementById('initE').value),
 
         v0      = parseFloat(document.getElementById('v0').value),
-        vmax    = parseFloat(document.getElementById('vmax').value);
-        lks     = parseFloat(document.getElementById('lks').value)
-        lpt     = parseFloat(document.getElementById('lpt').value)
+        a      = parseFloat(document.getElementById('a').value);
         ef      = document.getElementById('ef');
 
 let x       = [],
@@ -21,19 +19,21 @@ let x       = [],
     leb     = xmax - xmin,
     ngrid   = leb/dx;
 
-    //console.log(vmax,lks,lpt,xmin,xmax)
+    
     //console.log(initE + 1e-16)
-    singleEigen(xmin,xmax,dx,ngrid,v0,vpot,x,idx,efunction,iter,nloop,initE,leb,vmax,lks,lpt,vtemp,potensial_function = kronigPotential)
-    //console.log(vpot)
+    singleEigen(xmin,dx,ngrid,v0,vpot,x,idx,efunction,iter,nloop,initE,leb,a, vtemp,potensial_function = atrificialPotential)
+    //console.log(new Float32Array(initE))
 
     
 
-    vpot.forEach(function(item) {
+    efunction.forEach(function(item) {
       var listItem = document.createElement('li');
       listItem.className = "nostyle";
       listItem.innerText = item;
       document.getElementById("ef").appendChild(listItem);
      });
+
+     
 }
 
 // xmin = xmin.value;
@@ -45,57 +45,29 @@ function harmonicPotential(xmin,leb,om,x,v0 = 0)
 {
     //$xp = [];
     xp = x - xmin - leb / 2;
-    //console.log(xp)
+    //console.log(xp, x, xmin, leb)
     pot = (0.5 * om * xp * xp) + v0;
     return pot;
 }
 
-function kronigPotential(xmin,vmax,lks,lpt,x, v0 = 0)
-{
-    //console.log(vmax,lks,lpt,xmin)
-    //xp = [];
-    pot = [];
-    xp = x - xmin;
-    //console.log(xp)
-    xp = xp + lks / 2;
-    //console.log(xp)
-    // if ($xp >= 0 && fmod($xp, $lks) < ($lks / 1.4))
-    //if ($xp < $lks) 
-    if (xp % lpt < (lks)) {
-        pot = vmax;
-        //echo $xp;
-        // echo "<br>";
-        // echo "<br>";
-        // echo "<br>";
-        // echo "<br>";
-        // echo "<br>";
-        // echo fmod($xp, $lpt);
-        //echo "<br>";
-        //echo $lpt;
-        //return $pot;
-    } else {
-        pot = v0;
-        //return $pot;
-    }
-    return pot;
-    //var_dump($pot);
+function atrificialPotential(xmin,leb,a,x,v0 = 0) {
+    xp = x - xmin - leb / 2;
+   pot = ( -4 /(0.5+(Math.cos(0.5*xp))**16)/(a+Math.exp(xp*xp*0.01))) + v0;
+   return pot;
 }
 
-
-function singleEigen(xmin,xmax,dx,ngrid,v0,vpot,x,idx,efunction,iter,nloop,initE,leb,vmax,lks,lpt,vtemp,potensial_function = harmonicPotential)
+function singleEigen(xmin,dx,ngrid,v0,vpot,x,idx,efunction,iter,nloop,initE,leb, a, vtemp,potensial_function = harmonicPotential)
 {
-    //console.log(vmax,lks,lpt,xmin)
     for (let i = 0; i < ngrid; i++) {
         x[i] = xmin + ((i)  * dx);
         //console.log(x[i]);
-        //console.log(vmax,lks,lpt,xmin)
-        vpot[i] = potensial_function(xmin,vmax,lks,lpt,x[i],v0);
+
+        vpot[i] = potensial_function(xmin,leb,a,x[i], v0);
         idx[i] = i;
         //console.log(vpot[i])
     }
     // console.log(xmin,xmax,ngrid)
-    //console.log(vpot);
-    //console.log(x)
+    //console.log(x);
     eigenState(x,ngrid,efunction,vpot,initE,iter,nloop,dx,vtemp);
 }
 
@@ -209,7 +181,7 @@ function eigenState(x,ngrid,efunction,vpot,initE,iter,nloop,dx,vtemp)
     // }
       //ef.innerHTML = efunction;
 
-    //console.log(efunction)
+    console.log(efunction)
 
     Enew.innerHTML = initE;
 
